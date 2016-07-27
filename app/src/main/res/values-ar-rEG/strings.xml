@@ -2,13 +2,5 @@
 <resources>
 
 
-    <string name="action_example"></string>
 
-    <string name="action_settings"></string>
-    <string name="action_change_units"></string>
-    <string name="symbol_search"></string>
-    <string name="content_test">Search for a Stock Symbol</string>
-
-    <string name="input_prefill"></string>
-    <string name="network_toast"></string>
 </resources>
