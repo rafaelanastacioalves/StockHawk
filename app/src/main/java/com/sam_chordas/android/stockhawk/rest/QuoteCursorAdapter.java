@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,6 +95,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
   public static class ViewHolder extends RecyclerView.ViewHolder
       implements ItemTouchHelperViewHolder, View.OnClickListener{
+    private final String LOG_TAG = this.getClass().getSimpleName();
     public final TextView symbol;
     public final TextView bidPrice;
     public final TextView change;
@@ -117,7 +119,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
     @Override
     public void onClick(View v) {
-
+      Log.i(LOG_TAG,"On Click called!");
     }
   }
 }
