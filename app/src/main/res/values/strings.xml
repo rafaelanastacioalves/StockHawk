@@ -16,4 +16,5 @@
   <string name="a11y_bid_price">Bid price: <xliff:g id="price">%1$s</xliff:g> </string>
   <string name="a11y_percent_change">Percent change: <xliff:g id="price">%1$s</xliff:g> </string>
   <string name="a11y_change">Change: <xliff:g id="price">%1$s</xliff:g> </string>
+  <string name="a11y_add_stock">Add Stock</string>
 </resources>
