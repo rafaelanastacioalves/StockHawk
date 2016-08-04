@@ -6,7 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.sam_chordas.stockhawk.R;
+import com.sam_chordas.android.stockhawk.R;
+
 
 /**
  * A placeholder fragment containing a simple view.

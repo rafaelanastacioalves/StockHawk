@@ -1,17 +1,15 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 
-import com.example.sam_chordas.stockhawk.R;
-
-public class StockHistoryActivity extends Activity {
+import com.sam_chordas.android.stockhawk.R;
+public class StockHistoryActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_history);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 }

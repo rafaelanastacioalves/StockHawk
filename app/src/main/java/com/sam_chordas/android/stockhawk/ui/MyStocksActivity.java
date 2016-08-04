@@ -86,8 +86,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override public void onItemClick(View v, int position) {
+                if (mCursor!= null && mCursor.moveToPosition(position)){
+                  Intent i = new Intent(getBaseContext(), StockHistoryActivity.class);
+                  String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
+                  i.putExtra("SYMBOL_EXTRA",symbol);
+                  Log.i(LOG_TAG,  "onItemClick  Called! And is calling for " + symbol);
+                  startActivity(i);
 
-                Log.i(LOG_TAG,  "onItemClick  Called!");
+                }
+                Log.i(LOG_TAG,  "onItemClick  Called! And Not Worked");
+
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
