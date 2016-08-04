@@ -86,6 +86,7 @@ public class Utils {
           jsonObject.getString("ChangeinPercent"), true));
       builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
       builder.withValue(QuoteColumns.ISCURRENT, 1);
+      builder.withValue(QuoteColumns.LAST_TRADE_DATE, jsonObject.getString("LastTradeDate"));
       if (change.charAt(0) == '-'){
         builder.withValue(QuoteColumns.ISUP, 0);
       }else{
