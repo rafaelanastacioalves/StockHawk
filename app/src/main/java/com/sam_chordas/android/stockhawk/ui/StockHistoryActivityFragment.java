@@ -1,12 +1,12 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,6 @@ import com.db.chart.view.LineChartView;
 import com.db.chart.view.animation.Animation;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
-import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.rest.Utils;
 
 
@@ -27,11 +26,15 @@ import com.sam_chordas.android.stockhawk.rest.Utils;
 public class StockHistoryActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int STOCK_HISTORY_LOADER = 0;
+    public static  final String SYMBOL_EXTRA = "SYMBOL_EXTRA";
+    private static final int CURSOR_LOADER_STOCK_HISTORY_ID = 1;
     private final String LOG_TAG = getClass().getSimpleName();
     private String[] labels = {"p1", "p2", "p3" };
     private float[] values = {(float) 1.2, (float) 2.0, (float) 3.0};
     LineChartView lChart;
     private Cursor mCursor;
+    private Uri mData;
+    ;
 
 
     public StockHistoryActivityFragment() {
@@ -41,13 +44,16 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (savedInstanceState != null && savedInstanceState.containsKey("SYMBOL_EXTRA")){
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.containsKey(SYMBOL_EXTRA)){
             Log.i(LOG_TAG,"Has Extra!");
+            mData = arguments.getParcelable(SYMBOL_EXTRA);
         }
         View viewRoot = inflater.inflate(R.layout.fragment_stock_history, container, false);
 
         lChart = (LineChartView) viewRoot.findViewById(R.id.linechart);
 
+        getLoaderManager().initLoader(CURSOR_LOADER_STOCK_HISTORY_ID, null, this);
 
         return viewRoot;
         }
@@ -56,8 +62,17 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOG_TAG, "onCreateLoader");
         // TODO - Make a range for history...
-        return new CursorLoader(getContext(), QuoteProvider.Quotes.withSymbol("YHOO"),
-                new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, null ,null, null);
+        if (mData != null && id == CURSOR_LOADER_STOCK_HISTORY_ID){
+            Log.i(LOG_TAG, "on CreateLoader with data and same ID for Stock History!");
+
+            return new CursorLoader(getContext(), mData,
+                    new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, null ,null, null);
+
+        }else {
+            Log.i(LOG_TAG, "on CreateLoader with NO data or no ID required!");
+
+            return null;
+        }
 
 
     }
@@ -71,25 +86,48 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOG_TAG, "onLoadFinished");
-        mCursor = data;
 
-        labels = Utils.getLabelsForStockHistory(mCursor);
-        values = Utils.getValuesForStockHistory(mCursor);
+        if (loader.getId() == CURSOR_LOADER_STOCK_HISTORY_ID){
+            Log.i(LOG_TAG, "onLoadFinished for STOCK HISTORY LOADER");
 
-        LineSet ls = new LineSet(labels,  values);
+            mCursor = data;
 
-        ls.setFill(getResources().getColor(R.color.material_blue_500));
-        Animation animation = new Animation();
-        animation.setDuration(2000);
-        lChart.addData(ls);
-        Log.i(LOG_TAG,"Showing chart Data!");
+            labels = Utils.getLabelsForStockHistory(mCursor);
+            values = Utils.getValuesForStockHistory(mCursor);
 
-        lChart.show(animation);
+            LineSet ls = new LineSet(labels,  values);
+
+            ls.setFill(getResources().getColor(R.color.material_blue_500));
+            Animation animation = new Animation();
+            animation.setDuration(2000);
+            lChart.addData(ls);
+            if (lChart.isShown()){
+                Log.i(LOG_TAG,"Showing chart Data!");
+
+                lChart.show(animation);
+            }else {
+                Log.i(LOG_TAG,"NOT Showing chart Data! Because it is not visible");
+
+            }
+        }
+
+    }
+
+    @Override
+    public void onPause() {
+        Log.i(LOG_TAG,"Closing cursor for Stock History");
+
+        mCursor.close();
+        Log.i(LOG_TAG,"onPause: Destroying LOADER " + "CURSOR_LOADER_STOCK_HISTORY_ID");
+
+        getLoaderManager().destroyLoader(CURSOR_LOADER_STOCK_HISTORY_ID);
+        super.onPause();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.i(LOG_TAG,"onLoaderReset");
+
 
     }
 
