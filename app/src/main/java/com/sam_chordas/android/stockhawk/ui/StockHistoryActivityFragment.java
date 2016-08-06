@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,10 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     private float[] values = {(float) 1.2, (float) 2.0, (float) 3.0};
     LineChartView lChart;
     private Cursor mCursor;
+
+    private final String LOG_TAG = getClass().getSimpleName();
+    private String[] labels = {"p1", "p2", "p3" };
+    private float[] values = {(float) 1.2, (float) 2.0, (float) 3.0};
 
     public StockHistoryActivityFragment() {
         super();
@@ -75,6 +80,7 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
         values = Utils.getValuesForStockHistory(mCursor);
 
         LineSet ls = new LineSet(labels,  values);
+
         lChart.addData(ls);
         Log.i(LOG_TAG,"Showing chart Data!");
 
@@ -85,4 +91,5 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
 }
