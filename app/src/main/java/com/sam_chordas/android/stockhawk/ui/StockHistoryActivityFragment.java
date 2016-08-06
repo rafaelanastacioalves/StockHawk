@@ -1,7 +1,11 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,16 +14,20 @@ import android.view.ViewGroup;
 import com.db.chart.model.LineSet;
 import com.db.chart.view.LineChartView;
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.data.QuoteColumns;
+import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class StockHistoryActivityFragment extends Fragment {
+public class StockHistoryActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int STOCK_HISTORY_LOADER = 0;
     private final String LOG_TAG = getClass().getSimpleName();
     private String[] labels = {"p1", "p2", "p3" };
     private float[] values = {(float) 1.2, (float) 2.0, (float) 3.0};
+    private Cursor mCursor;
 
     public StockHistoryActivityFragment() {
         super();
@@ -42,4 +50,31 @@ public class StockHistoryActivityFragment extends Fragment {
         lChart.show();
         return viewRoot;
         }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.i(LOG_TAG, "onCreateLoader");
+        return new CursorLoader(getContext(), QuoteProvider.Quotes.withSymbol("YHOO"),
+                new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, null ,null, null);
+
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(STOCK_HISTORY_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.i(LOG_TAG, "onLoadFinished");
+        mCursor = data;
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }
