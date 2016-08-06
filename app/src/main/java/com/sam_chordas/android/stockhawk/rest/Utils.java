@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
+import android.database.Cursor;
 import android.util.Log;
 
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
@@ -97,5 +98,40 @@ public class Utils {
       e.printStackTrace();
     }
     return builder.build();
+  }
+
+  public static String[] getLabelsForStockHistory(Cursor mCursor) {
+    ArrayList<String> valuesList = new ArrayList<>();
+    if (mCursor != null && mCursor.moveToFirst() ){
+      do {
+        valuesList.add(
+                mCursor.getString(mCursor.getColumnIndex(QuoteColumns.LAST_TRADE_DATE))
+        );
+      }while(mCursor.moveToNext());
+    }
+    return  valuesList.toArray(new String[mCursor.getCount()]);
+  }
+
+  public static float[] getValuesForStockHistory(Cursor mCursor) {
+    float[] valuesList = new float[mCursor.getCount()];
+    if (mCursor != null && mCursor.moveToFirst() ){
+      int position =0;
+      do {
+        valuesList[position]=
+                parseBidPriceToFloat(
+                        mCursor.getString(mCursor.getColumnIndex(QuoteColumns.BIDPRICE)
+                        )
+
+
+        );
+      }while(mCursor.moveToNext());
+    }
+    return valuesList;
+  }
+
+  private static float parseBidPriceToFloat(String string) {
+    return Float.parseFloat(
+            string.replace(",", ".")
+    );
   }
 }

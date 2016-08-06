@@ -16,6 +16,7 @@ import com.db.chart.view.LineChartView;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.rest.Utils;
 
 
 /**
@@ -27,6 +28,7 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     private final String LOG_TAG = getClass().getSimpleName();
     private String[] labels = {"p1", "p2", "p3" };
     private float[] values = {(float) 1.2, (float) 2.0, (float) 3.0};
+    LineChartView lChart;
     private Cursor mCursor;
 
     public StockHistoryActivityFragment() {
@@ -41,19 +43,16 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
         }
         View viewRoot = inflater.inflate(R.layout.fragment_stock_history, container, false);
 
-        LineChartView lChart = (LineChartView) viewRoot.findViewById(R.id.linechart);
+        lChart = (LineChartView) viewRoot.findViewById(R.id.linechart);
 
-        LineSet ls = new LineSet(labels, values);
-        lChart.addData(ls);
-        Log.i(LOG_TAG,"Showing chart Data!");
 
-        lChart.show();
         return viewRoot;
         }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOG_TAG, "onCreateLoader");
+        // TODO - Make a range for history...
         return new CursorLoader(getContext(), QuoteProvider.Quotes.withSymbol("YHOO"),
                 new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, null ,null, null);
 
@@ -71,6 +70,15 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i(LOG_TAG, "onLoadFinished");
         mCursor = data;
+
+        labels = Utils.getLabelsForStockHistory(mCursor);
+        values = Utils.getValuesForStockHistory(mCursor);
+
+        LineSet ls = new LineSet(labels,  values);
+        lChart.addData(ls);
+        Log.i(LOG_TAG,"Showing chart Data!");
+
+        lChart.show();
     }
 
     @Override
