@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.db.chart.model.LineSet;
 import com.db.chart.view.LineChartView;
+import com.db.chart.view.animation.Animation;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
@@ -32,9 +33,6 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     LineChartView lChart;
     private Cursor mCursor;
 
-    private final String LOG_TAG = getClass().getSimpleName();
-    private String[] labels = {"p1", "p2", "p3" };
-    private float[] values = {(float) 1.2, (float) 2.0, (float) 3.0};
 
     public StockHistoryActivityFragment() {
         super();
@@ -81,10 +79,13 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
 
         LineSet ls = new LineSet(labels,  values);
 
+        ls.setFill(getResources().getColor(R.color.material_blue_500));
+        Animation animation = new Animation();
+        animation.setDuration(2000);
         lChart.addData(ls);
         Log.i(LOG_TAG,"Showing chart Data!");
 
-        lChart.show();
+        lChart.show(animation);
     }
 
     @Override
