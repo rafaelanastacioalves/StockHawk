@@ -122,8 +122,9 @@ public class Utils {
                         mCursor.getString(mCursor.getColumnIndex(QuoteColumns.BIDPRICE)
                         )
 
-
         );
+        position++;
+
       }while(mCursor.moveToNext());
     }
     return valuesList;

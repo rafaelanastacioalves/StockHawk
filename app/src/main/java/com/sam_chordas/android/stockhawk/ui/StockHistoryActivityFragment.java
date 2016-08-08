@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -64,9 +65,9 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
         // TODO - Make a range for history...
         if (mData != null && id == CURSOR_LOADER_STOCK_HISTORY_ID){
             Log.i(LOG_TAG, "on CreateLoader with data and same ID for Stock History!");
-
+            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY (" + QuoteColumns.BIDPRICE + " ";
             return new CursorLoader(getContext(), mData,
-                    new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, null ,null, null);
+                    new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, selection ,null, null);
 
         }else {
             Log.i(LOG_TAG, "on CreateLoader with NO data or no ID required!");
@@ -91,7 +92,8 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
             Log.i(LOG_TAG, "onLoadFinished for STOCK HISTORY LOADER");
 
             mCursor = data;
-
+            Log.d(LOG_TAG,"The cursor returned was: \n"
+            + DatabaseUtils.dumpCursorToString(mCursor));
             labels = Utils.getLabelsForStockHistory(mCursor);
             values = Utils.getValuesForStockHistory(mCursor);
 
