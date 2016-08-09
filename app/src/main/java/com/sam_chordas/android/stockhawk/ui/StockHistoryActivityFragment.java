@@ -65,7 +65,7 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
         // TODO - Make a range for history...
         if (mData != null && id == CURSOR_LOADER_STOCK_HISTORY_ID){
             Log.i(LOG_TAG, "on CreateLoader with data and same ID for Stock History!");
-            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY (" + QuoteColumns.BIDPRICE + " ";
+            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY ( " + QuoteColumns.BIDPRICE + ") ORDER BY ( " + QuoteColumns.LAST_TRADE_DATE ;
             return new CursorLoader(getContext(), mData,
                     new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, selection ,null, null);
 
@@ -103,9 +103,13 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
 
             ls.setFill(getResources().getColor(R.color.material_blue_500));
             Animation animation = new Animation();
-            animation.setDuration(2000);
+            animation.setDuration(1000);
+
+            ls.setDotsColor(getResources().getColor(R.color.material_red_700));
+
             lChart.addData(ls);
             lChart.setAxisBorderValues(Utils.getMinValue(values) , Utils.getMaxValue(values));
+
             if (lChart.isShown()){
                 Log.i(LOG_TAG,"Showing chart Data!");
 

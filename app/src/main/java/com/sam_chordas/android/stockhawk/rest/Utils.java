@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -105,11 +106,22 @@ public class Utils {
     if (mCursor != null && mCursor.moveToFirst() ){
       do {
         valuesList.add(
-                mCursor.getString(mCursor.getColumnIndex(QuoteColumns.LAST_TRADE_DATE))
+                removeYearFromString(
+                        mCursor.getString(mCursor.getColumnIndex(QuoteColumns.LAST_TRADE_DATE))
+                )
         );
       }while(mCursor.moveToNext());
     }
     return  valuesList.toArray(new String[mCursor.getCount()]);
+  }
+
+  private static String removeYearFromString(String string) {
+
+    Date d = new Date(string);
+    String finalString = d.getDate()
+            + "/"
+            + (d.getMonth() + 1);
+    return finalString;
   }
 
   public static float[] getValuesForStockHistory(Cursor mCursor) {
@@ -145,7 +157,7 @@ public class Utils {
       }
     }
 
-    return (int) (minValue - minValue%10) ;
+    return (int) Math.floor(minValue) ;
   }
 
   public static int getMaxValue(float[] values) {
@@ -156,7 +168,7 @@ public class Utils {
 
       }
     }
-    return (int) (maxValue - maxValue%10  + 1) ;
+    return (int) Math.ceil(maxValue) ;
 
   }
 }
