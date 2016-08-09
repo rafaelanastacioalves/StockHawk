@@ -97,12 +97,15 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
             labels = Utils.getLabelsForStockHistory(mCursor);
             values = Utils.getValuesForStockHistory(mCursor);
 
+
+
             LineSet ls = new LineSet(labels,  values);
 
             ls.setFill(getResources().getColor(R.color.material_blue_500));
             Animation animation = new Animation();
             animation.setDuration(2000);
             lChart.addData(ls);
+            lChart.setAxisBorderValues(Utils.getMinValue(values) , Utils.getMaxValue(values));
             if (lChart.isShown()){
                 Log.i(LOG_TAG,"Showing chart Data!");
 

@@ -135,4 +135,28 @@ public class Utils {
             string.replace(",", ".")
     );
   }
+
+  public static int getMinValue(float[] values) {
+    float minValue = values[0];
+    for (float value:values){
+      if (value < minValue){
+        minValue = value;
+
+      }
+    }
+
+    return (int) (minValue - minValue%10) ;
+  }
+
+  public static int getMaxValue(float[] values) {
+    float maxValue = values[0];
+    for (float value : values) {
+      if (value > maxValue) {
+        maxValue = value;
+
+      }
+    }
+    return (int) (maxValue - maxValue%10  + 1) ;
+
+  }
 }
