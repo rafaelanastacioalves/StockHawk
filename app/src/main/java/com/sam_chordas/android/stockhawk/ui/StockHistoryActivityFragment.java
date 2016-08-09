@@ -123,6 +123,12 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     }
 
     @Override
+    public void onResume() {
+        getLoaderManager().restartLoader(CURSOR_LOADER_STOCK_HISTORY_ID,null, this);
+        super.onResume();
+    }
+
+    @Override
     public void onPause() {
         Log.i(LOG_TAG,"Closing cursor for Stock History");
 
