@@ -65,7 +65,7 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
         // TODO - Make a range for history...
         if (mData != null && id == CURSOR_LOADER_STOCK_HISTORY_ID){
             Log.i(LOG_TAG, "on CreateLoader with data and same ID for Stock History!");
-            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY ( " + QuoteColumns.BIDPRICE + ") ORDER BY ( " + QuoteColumns.LAST_TRADE_DATE ;
+            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY ( " + QuoteColumns.BIDPRICE + ") ORDER BY ( " + QuoteColumns.LAST_TRADE_DATE + ") LIMIT ( 10 ";
             return new CursorLoader(getContext(), mData,
                     new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, selection ,null, null);
 
