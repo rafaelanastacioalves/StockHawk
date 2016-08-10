@@ -18,4 +18,5 @@
     <string name="a11y_change">Change: <xliff:g id="price">%1$s</xliff:g> </string>
     <string name="a11y_add_stock">Add Stock</string>
     <string name="title_activity_stock_history">StockHistoryActivity</string>
+    <string name="title_widget_stock">Stocks Widget</string>
 </resources>
