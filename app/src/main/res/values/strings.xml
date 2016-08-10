@@ -19,4 +19,5 @@
     <string name="a11y_add_stock">Add Stock</string>
     <string name="title_activity_stock_history">StockHistoryActivity</string>
     <string name="title_widget_stock">Stocks Widget</string>
+    <string name="empty_forecast_list">No Stock to Show</string>
 </resources>
