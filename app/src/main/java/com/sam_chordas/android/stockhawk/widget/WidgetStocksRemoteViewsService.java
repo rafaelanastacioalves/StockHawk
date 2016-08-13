@@ -134,6 +134,14 @@ public class WidgetStocksRemoteViewsService extends RemoteViewsService {
                     views.setContentDescription(R.id.change ,mContext.getString(R.string.a11y_change ,data.getString(data.getColumnIndex("change"))));
 
                 }
+
+
+                final Intent fillInIntent = new Intent();
+                String symbol = data.getString(data.getColumnIndex("symbol"));
+                Uri u = QuoteProvider.Quotes.withSymbol(symbol);
+                fillInIntent.setData(u);
+                views.setOnClickFillInIntent(R.id.widget_stock_list_item, fillInIntent);
+
                 Log.i(LOG_TAG, "getViewAt: end");
 
                 return views;
