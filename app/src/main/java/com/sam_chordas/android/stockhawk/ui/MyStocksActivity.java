@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,6 +22,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -38,7 +40,7 @@ import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
-public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener{
   private  final String LOG_TAG = getClass().getSimpleName();
 
   /**
@@ -83,8 +85,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
-
-    mCursorAdapter = new QuoteCursorAdapter(this, null);
+    View emptyView = findViewById(R.id.recycler_view_quote_empty);
+    mCursorAdapter = new QuoteCursorAdapter(this, null, emptyView);
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override public void onItemClick(View v, int position) {
@@ -231,9 +233,41 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mCursor = data;
   }
 
+
+
   @Override
   public void onLoaderReset(Loader<Cursor> loader){
     mCursorAdapter.swapCursor(null);
   }
 
+  @Override
+  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    if (key.equals(getString(R.string.pref_stock_query_status_key))) {
+      setEmptyView();
+    }
+  }
+
+  private void setEmptyView() {
+    if ( mCursorAdapter.getItemCount() == 0 ) {
+      TextView tv = (TextView) findViewById(R.id.recycler_view_quote_empty);
+      if ( null != tv ) {
+        // if cursor is empty, why? do we have an invalid location
+        int message = R.string.empty_forecast_list;
+        @StockTaskService.LocationStatus int location = Utils.getLocationStatus(this);
+        switch (location) {
+          case StockTaskService.LOCATION_STATUS_SERVER_DOWN:
+            message = R.string.empty_forecast_list_server_down;
+            break;
+          case StockTaskService.LOCATION_STATUS_SERVER_INVALID:
+            message = R.string.empty_forecast_list_server_error;
+            break;
+          default:
+            if (!Utils.isNetworkAvailable(this)) {
+              message = R.string.empty_forecast_list_no_network;
+            }
+        }
+        tv.setText(message);
+      }
+    }
+  }
 }

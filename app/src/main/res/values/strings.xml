@@ -11,6 +11,15 @@
     <string name="input_prefill"></string>
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
 
+    <!--Used for storing the stock query status shared preferences -->
+    <string name="pref_stock_query_status_key" translatable="false">stock_query-status</string>
+
+    <!--Used for error showing when make a query for stocks-->
+    <string name="empty_forecast_list_server_down">No stock available. The server is not returning data.</string>
+    <string name="empty_forecast_list_server_error">No stock available. The server is not returning valid data.</string>
+    <string name="empty_forecast_list_no_network">No stock available. The network is not available to fetch weather data.</string>
+
+
     <!--A11y-->
     <string name="a11y_symbol">Symbol: <xliff:g id="symbol">%1$s</xliff:g> </string>
     <string name="a11y_bid_price">Bid price: <xliff:g id="price">%1$s</xliff:g> </string>
@@ -20,4 +29,5 @@
     <string name="title_activity_stock_history">StockHistoryActivity</string>
     <string name="title_widget_stock">Stocks Widget</string>
     <string name="empty_forecast_list">No Stock to Show</string>
+
 </resources>

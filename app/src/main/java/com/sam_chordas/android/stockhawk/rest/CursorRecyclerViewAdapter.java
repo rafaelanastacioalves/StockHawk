@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 
 /**
  * Created by sam_chordas on 10/6/15.
@@ -13,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
  */
 public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>{
   private static final String LOG_TAG = CursorRecyclerViewAdapter.class.getSimpleName();
+  private  View mEmptyView;
   private Cursor mCursor;
   private boolean dataIsValid;
   private int rowIdColumn;
@@ -26,6 +29,13 @@ public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHol
       mCursor.registerDataSetObserver(mDataSetObserver);
     }
   }
+
+  public CursorRecyclerViewAdapter(Context context, Cursor cursor, View emptyView){
+    this(context,cursor);
+    this.mEmptyView = emptyView;
+
+  }
+
 
   public Cursor getCursor(){
     return mCursor;
@@ -77,6 +87,12 @@ public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHol
       if (mDataSetObserver != null){
         mCursor.registerDataSetObserver(mDataSetObserver);
       }
+
+      //setting EmptyList 0 for VISIBLE and 8 for GONE
+      mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+      Log.i(LOG_TAG,"Set emptyView visibility: " + mEmptyView.getVisibility());
+
+
       rowIdColumn = newCursor.getColumnIndexOrThrow("_id");
       dataIsValid = true;
       notifyDataSetChanged();
