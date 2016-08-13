@@ -1,5 +1,6 @@
 package com.sam_chordas.android.stockhawk.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -93,9 +94,11 @@ public class WidgetStocksRemoteViewsService extends RemoteViewsService {
                 RemoteViews views = new RemoteViews(getPackageName(),
                         R.layout.list_item_quote);
                 views.setTextViewText(R.id.stock_symbol ,data.getString(data.getColumnIndex("symbol")));
-                views.setContentDescription(R.id.stock_symbol, mContext.getString(R.string.a11y_symbol ,data.getString(data.getColumnIndex("symbol"))));
                 views.setTextViewText(R.id.bid_price ,data.getString(data.getColumnIndex("bid_price")));
-                views.setContentDescription(R.id.bid_price ,mContext.getString(R.string.a11y_bid_price ,data.getString(data.getColumnIndex("bid_price"))));
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                    setRemoteContentDescription(views, mContext);
+                }
 
                 int sdk = Build.VERSION.SDK_INT;
                 if (data.getInt(data.getColumnIndex("is_up")) == 1){
@@ -127,11 +130,9 @@ public class WidgetStocksRemoteViewsService extends RemoteViewsService {
                     Log.i(LOG_TAG, "showing percent");
 
                     views.setTextViewText(R.id.change, data.getString(data.getColumnIndex("percent_change")));
-                    views.setContentDescription(R.id.change ,mContext.getString(R.string.a11y_percent_change ,data.getString(data.getColumnIndex("percent_change"))));
                 } else{
                     Log.i(LOG_TAG, "not showing percent");
                     views.setTextViewText(R.id.change, data.getString(data.getColumnIndex("change")));
-                    views.setContentDescription(R.id.change ,mContext.getString(R.string.a11y_change ,data.getString(data.getColumnIndex("change"))));
 
                 }
 
@@ -152,6 +153,16 @@ public class WidgetStocksRemoteViewsService extends RemoteViewsService {
                 Log.i(LOG_TAG, "getLoadingView");
 
                 return new RemoteViews(getPackageName(), R.layout.list_item_quote);
+            }
+
+            @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+            private void setRemoteContentDescription(RemoteViews views,  Context mContext) {
+                views.setContentDescription(R.id.stock_symbol, mContext.getString(R.string.a11y_symbol ,data.getString(data.getColumnIndex("symbol"))));
+                views.setContentDescription(R.id.bid_price ,mContext.getString(R.string.a11y_bid_price ,data.getString(data.getColumnIndex("bid_price"))));
+                views.setContentDescription(R.id.change ,mContext.getString(R.string.a11y_percent_change ,data.getString(data.getColumnIndex("percent_change"))));
+                views.setContentDescription(R.id.change ,mContext.getString(R.string.a11y_change ,data.getString(data.getColumnIndex("change"))));
+
+
             }
 
             @Override
