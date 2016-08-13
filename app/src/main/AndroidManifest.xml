@@ -52,13 +52,19 @@
                 android:value="com.sam_chordas.android.stockhawk.ui.MyStocksActivity" />
         </activity>
 
+        <service
+            android:name=".widget.WidgetStocksRemoteViewsService"
+            android:enabled="@bool/widget_detail_enabled"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <receiver
-            android:name=".widget.StockWidgetPovider"
+            android:name=".widget.StocksWidgetProvider"
             android:label="@string/title_widget_stock"
             android:enabled="@bool/widget_detail_enabled" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.sam_chordas.android.stockhawk.ACTION_DATA_UPDATED" />
+                <action android:name="com.sam_chordas.android.stockhawk.ACTION_NEW_DATA" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info_stock" />

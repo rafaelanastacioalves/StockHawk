@@ -138,11 +138,15 @@ public class StockTaskService extends GcmTaskService{
   }
 
   private void updateWidget() {
-    Context context = getApplicationContext();
-    // Setting the package ensures that only components in our app will receive the broadcast
-    Intent dataUpdatedIntent = new Intent(ACTION_NEW_DATA)
-            .setPackage(context.getPackageName());
-    context.sendBroadcast(dataUpdatedIntent);
+    if(mContext != null){
+      // Setting the package ensures that only components in our app will receive the broadcast
+      Intent dataUpdatedIntent = new Intent(ACTION_NEW_DATA)
+              .setPackage(mContext.getPackageName());
+      mContext.sendBroadcast(dataUpdatedIntent);
+    }else{
+      Log.e(LOG_TAG, "Not getting context!");
+    }
+
   }
 
 }
