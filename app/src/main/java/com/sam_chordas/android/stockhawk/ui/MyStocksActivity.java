@@ -58,6 +58,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
+  private long lastSyncTimeStamp;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +79,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       mServiceIntent.putExtra("tag", "init");
       if (isConnected){
         startService(mServiceIntent);
-      } else{
-        networkToast();
       }
     }
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -175,10 +174,24 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onResume() {
     super.onResume();
     getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+    ConnectivityManager cm =
+            (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+    isConnected = activeNetwork != null &&
+            activeNetwork.isConnectedOrConnecting();
+    if (!isConnected){
+
+      networkToast();
+    }
   }
 
   public void networkToast(){
     Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
+    if(mCursor != null && mCursor.getCount() >0 && Utils.isDataOutDated(this)){
+      Toast.makeText(mContext, getString(R.string.outdated_toast), Toast.LENGTH_LONG).show();
+
+    }
   }
 
   public void restoreActionBar() {
@@ -227,10 +240,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         null);
   }
 
+
+
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
     mCursorAdapter.swapCursor(data);
     mCursor = data;
+    lastSyncTimeStamp = Calendar.getInstance().getTimeInMillis();
   }
 
 
@@ -243,11 +259,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     if (key.equals(getString(R.string.pref_stock_query_status_key))) {
-      setEmptyView();
+      setUpEmptyView();
     }
   }
 
-  private void setEmptyView() {
+  private void setUpEmptyView() {
     if ( mCursorAdapter.getItemCount() == 0 ) {
       TextView tv = (TextView) findViewById(R.id.recycler_view_quote_empty);
       if ( null != tv ) {
@@ -268,6 +284,19 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         }
         tv.setText(message);
       }
+    }
+  }
+
+  @Override
+  public void onNetworkActive() {
+    Log.i(LOG_TAG,"Network is active!");
+    mServiceIntent = new Intent(this, StockIntentService.class);
+    // Run the initialize task service so that some stocks appear upon an empty database
+    mServiceIntent.putExtra("tag", "init");
+    if (isConnected) {
+      startService(mServiceIntent);
+
+
     }
   }
 }

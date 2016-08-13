@@ -30,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URLEncoder;
+import java.util.Calendar;
 
 /**
  * Created by sam_chordas on 9/30/15.
@@ -153,6 +154,7 @@ public class StockTaskService extends GcmTaskService{
           mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
               Utils.quoteJsonToContentVals(getResponse));
           setLocationStatus(mContext, LOCATION_STATUS_OK);
+          setSyncTimeStamp(mContext);
           updateWidget();
         }catch (RemoteException | OperationApplicationException e){
           Log.e(LOG_TAG, "Error applying batch insert", e);
@@ -191,4 +193,14 @@ public class StockTaskService extends GcmTaskService{
     spe.commit();
   }
 
-}
+  private void setSyncTimeStamp(Context c) {
+    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+    SharedPreferences.Editor spe = sp.edit();
+    Log.i(LOG_TAG,"Setting time stamp: " + Calendar.getInstance().getTimeInMillis() );
+    spe.putLong(c.getString(R.string.pref_Last_sync_time_stamp_key), Calendar.getInstance().getTimeInMillis());
+    spe.commit();
+
+  }
+
+
+  }

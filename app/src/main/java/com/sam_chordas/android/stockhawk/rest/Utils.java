@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -29,6 +30,7 @@ public class Utils {
   private static String LOG_TAG = Utils.class.getSimpleName();
 
   public static boolean showPercent = true;
+  private static final long triggerTime = 1000*60*60; // 1h
 
   public static ArrayList quoteJsonToContentVals(String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
@@ -193,5 +195,16 @@ public class Utils {
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     return activeNetwork != null &&
             activeNetwork.isConnectedOrConnecting();
+  }
+
+  public static boolean isDataOutDated(Context c) {
+    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+    long lastSync = sp.getLong(c.getString(R.string.pref_Last_sync_time_stamp_key), StockTaskService.LOCATION_STATUS_UNKNOWN);
+    long timeLapse = Calendar.getInstance().getTimeInMillis() - lastSync;
+    if(timeLapse > triggerTime){
+      return true;
+    }else {
+      return false;
+    }
   }
 }
