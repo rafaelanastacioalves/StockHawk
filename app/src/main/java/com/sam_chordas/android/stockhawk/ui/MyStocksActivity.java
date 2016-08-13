@@ -40,6 +40,8 @@ import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
+import java.util.Calendar;
+
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener{
   private  final String LOG_TAG = getClass().getSimpleName();
 
@@ -267,10 +269,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     if ( mCursorAdapter.getItemCount() == 0 ) {
       TextView tv = (TextView) findViewById(R.id.recycler_view_quote_empty);
       if ( null != tv ) {
-        // if cursor is empty, why? do we have an invalid location
         int message = R.string.empty_forecast_list;
-        @StockTaskService.LocationStatus int location = Utils.getLocationStatus(this);
-        switch (location) {
+        @StockTaskService.StockQueryStatus int status = Utils.getStockQueryStatus(this);
+        switch (status) {
           case StockTaskService.LOCATION_STATUS_SERVER_DOWN:
             message = R.string.empty_forecast_list_server_down;
             break;
@@ -287,16 +288,5 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     }
   }
 
-  @Override
-  public void onNetworkActive() {
-    Log.i(LOG_TAG,"Network is active!");
-    mServiceIntent = new Intent(this, StockIntentService.class);
-    // Run the initialize task service so that some stocks appear upon an empty database
-    mServiceIntent.putExtra("tag", "init");
-    if (isConnected) {
-      startService(mServiceIntent);
 
-
-    }
-  }
 }

@@ -181,8 +181,8 @@ public class Utils {
 
   }
   @SuppressWarnings("ResourceType")
-  static public @StockTaskService.LocationStatus
-  int getLocationStatus(Context c){
+  static public @StockTaskService.StockQueryStatus
+  int getStockQueryStatus(Context c){
     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
     return sp.getInt(c.getString(R.string.pref_stock_query_status_key), StockTaskService.LOCATION_STATUS_UNKNOWN);
   }

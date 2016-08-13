@@ -48,7 +48,7 @@ public class StockTaskService extends GcmTaskService{
 
   @Retention(RetentionPolicy.SOURCE)
   @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
-  public @interface LocationStatus {}
+  public @interface StockQueryStatus {}
 
   public static final int LOCATION_STATUS_OK = 0;
   public static final int LOCATION_STATUS_SERVER_DOWN = 1;
@@ -137,7 +137,7 @@ public class StockTaskService extends GcmTaskService{
         getResponse = fetchData(urlString);
         JSONObject jsonObject = new JSONObject(getResponse);
         if (jsonObject != null && jsonObject.length() == 0) {
-          setLocationStatus(mContext, LOCATION_STATUS_SERVER_DOWN);
+          setStockQueryStatus(mContext, LOCATION_STATUS_SERVER_DOWN);
           return result;
         }else {
           result = GcmNetworkManager.RESULT_SUCCESS;
@@ -153,7 +153,7 @@ public class StockTaskService extends GcmTaskService{
           }
           mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
               Utils.quoteJsonToContentVals(getResponse));
-          setLocationStatus(mContext, LOCATION_STATUS_OK);
+          setStockQueryStatus(mContext, LOCATION_STATUS_OK);
           setSyncTimeStamp(mContext);
           updateWidget();
         }catch (RemoteException | OperationApplicationException e){
@@ -161,12 +161,12 @@ public class StockTaskService extends GcmTaskService{
         }
       } catch (IOException e){
         e.printStackTrace();
-        setLocationStatus(mContext, LOCATION_STATUS_SERVER_DOWN);
+        setStockQueryStatus(mContext, LOCATION_STATUS_SERVER_DOWN);
 
       } catch (JSONException e) {
         Log.e(LOG_TAG, e.getMessage(), e);
         e.printStackTrace();
-        setLocationStatus(mContext, LOCATION_STATUS_SERVER_INVALID);
+        setStockQueryStatus(mContext, LOCATION_STATUS_SERVER_INVALID);
 
       }
     }
@@ -186,10 +186,10 @@ public class StockTaskService extends GcmTaskService{
 
   }
 
-  static private void setLocationStatus(Context c, @LocationStatus int locationStatus){
+  static private void setStockQueryStatus(Context c, @StockQueryStatus int status){
     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
     SharedPreferences.Editor spe = sp.edit();
-    spe.putInt(c.getString(R.string.pref_stock_query_status_key), locationStatus);
+    spe.putInt(c.getString(R.string.pref_stock_query_status_key), status);
     spe.commit();
   }
 
