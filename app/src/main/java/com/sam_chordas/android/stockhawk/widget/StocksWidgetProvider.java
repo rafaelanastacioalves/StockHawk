@@ -19,6 +19,7 @@ import com.sam_chordas.android.stockhawk.ui.StockHistoryActivity;
 
 /**
  * Created by rafaelanastacioalves on 8/10/16.
+ *  Adapted from the Udacity Lessions about WidgetProviders.
  */
 public class StocksWidgetProvider extends AppWidgetProvider {
     private  final String LOG_TAG = getClass().getSimpleName();

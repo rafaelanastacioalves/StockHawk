@@ -19,6 +19,7 @@ import com.sam_chordas.android.stockhawk.rest.Utils;
 
 /**
  * Created by rafaelanastacioalves on 8/10/16.
+ * Adapted from the Udacity lessons about RemoteViewsService.
  */
 public class WidgetStocksRemoteViewsService extends RemoteViewsService {
     @Override
