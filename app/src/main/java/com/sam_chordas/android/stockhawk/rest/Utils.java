@@ -47,6 +47,9 @@ public class Utils {
           if (jsonObject.getString("Bid")!= "null") {
             batchOperations.add(buildBatchOperation(jsonObject));
           }
+          else{
+            throw new InvalidStockException();
+          }
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
@@ -206,5 +209,14 @@ public class Utils {
     }else {
       return false;
     }
+  }
+
+  public static boolean getLastUserValidStockSearch(Context applicationContext) {
+    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+    return sp.getBoolean(applicationContext.getString(R.string.pref_user_search_stock_valid_status),false);
+
+  }
+
+  public static class InvalidStockException extends NullPointerException {
   }
 }

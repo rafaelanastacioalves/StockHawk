@@ -4,7 +4,11 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.google.android.gms.gcm.TaskParams;
+import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.rest.Utils;
 
 /**
  * Created by sam_chordas on 10/1/15.
@@ -19,7 +23,7 @@ public class StockIntentService extends IntentService {
     super(name);
   }
 
-  @Override protected void onHandleIntent(Intent intent) {
+  @Override protected void onHandleIntent(Intent intent) throws Utils.InvalidStockException {
     Log.d(StockIntentService.class.getSimpleName(), "Stock Intent Service");
     StockTaskService stockTaskService = new StockTaskService(this);
     Bundle args = new Bundle();
@@ -28,6 +32,10 @@ public class StockIntentService extends IntentService {
     }
     // We can call OnRunTask from the intent service to force it to run immediately instead of
     // scheduling a task.
-    stockTaskService.onRunTask(new TaskParams(intent.getStringExtra("tag"), args));
+    try {
+      stockTaskService.onRunTask(new TaskParams(intent.getStringExtra("tag"), args));
+    }catch(Utils.InvalidStockException e){
+      Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_stock), Toast.LENGTH_SHORT).show();
+    }
   }
 }

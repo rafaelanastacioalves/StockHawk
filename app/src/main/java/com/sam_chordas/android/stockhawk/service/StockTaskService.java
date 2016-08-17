@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.util.Log;
+
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
@@ -71,7 +72,7 @@ public class StockTaskService extends GcmTaskService{
   }
 
   @Override
-  public int onRunTask(TaskParams params){
+  public int onRunTask  (TaskParams params){
     Cursor initQueryCursor;
     if (mContext == null){
       mContext = this;
@@ -151,8 +152,15 @@ public class StockTaskService extends GcmTaskService{
             mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
                 null, null);
           }
-          mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-              Utils.quoteJsonToContentVals(getResponse));
+            try{
+                mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
+                        Utils.quoteJsonToContentVals(getResponse));
+                setLastUserStockValidSearchStatus(mContext, true);
+
+            }catch (Utils.InvalidStockException e){
+                setLastUserStockValidSearchStatus(mContext, false);
+            }
+
           setStockQueryStatus(mContext, LOCATION_STATUS_OK);
           setSyncTimeStamp(mContext);
           updateWidget();
@@ -162,7 +170,6 @@ public class StockTaskService extends GcmTaskService{
       } catch (IOException e){
         e.printStackTrace();
         setStockQueryStatus(mContext, LOCATION_STATUS_SERVER_DOWN);
-
       } catch (JSONException e) {
         Log.e(LOG_TAG, e.getMessage(), e);
         e.printStackTrace();
@@ -174,7 +181,15 @@ public class StockTaskService extends GcmTaskService{
     return result;
   }
 
-  private void updateWidget() {
+    private void setLastUserStockValidSearchStatus(Context c, boolean b) {
+        Log.i(LOG_TAG, "Telling that the Stock Search validity is " + b);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putBoolean(c.getString(R.string.pref_user_search_stock_valid_status), b);
+        spe.commit();
+    }
+
+    private void updateWidget() {
     if(mContext != null){
       // Setting the package ensures that only components in our app will receive the broadcast
       Intent dataUpdatedIntent = new Intent(ACTION_NEW_DATA)

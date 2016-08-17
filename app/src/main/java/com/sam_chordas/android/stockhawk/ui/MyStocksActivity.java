@@ -80,7 +80,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       // Run the initialize task service so that some stocks appear upon an empty database
       mServiceIntent.putExtra("tag", "init");
       if (isConnected){
-        startService(mServiceIntent);
+        try{
+          startService(mServiceIntent);
+        }catch(Utils.InvalidStockException e){
+          Toast.makeText(this, R.string.invalid_stock, Toast.LENGTH_SHORT).show();
+        }
       }
     }
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -133,7 +137,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                     // Add the stock to DB
                     mServiceIntent.putExtra("tag", "add");
                     mServiceIntent.putExtra("symbol", input.toString());
-                    startService(mServiceIntent);
+                    try {
+                        Log.i(LOG_TAG,"Calling the service to store the new Stock...");
+                        startService(mServiceIntent);
+                        Log.i(LOG_TAG,"...Done");
+
+                    }catch(Utils.InvalidStockException e){
+                        Log.e(LOG_TAG,"...Not Possible calling the service correclty! Invalid Stock Option.");
+
+                        Toast.makeText(getApplicationContext(), R.string.invalid_stock, Toast.LENGTH_SHORT).show();
+                    }
                   }
                 }
               })
@@ -260,8 +273,15 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+      Log.i(LOG_TAG, "Getting the preference value for key: " + key);
     if (key.equals(getString(R.string.pref_stock_query_status_key))) {
       setUpEmptyView();
+    }
+    if(key.equals(getString(R.string.pref_user_search_stock_valid_status))){
+        if(Utils.getLastUserValidStockSearch(getApplicationContext()) == true ){
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_stock), Toast.LENGTH_SHORT).show();
+
+        }
     }
   }
 
