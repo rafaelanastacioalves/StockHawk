@@ -37,7 +37,6 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
     LineChartView lChart;
     private Cursor mCursor;
     private Uri mData;
-    ;
 
 
     public StockHistoryActivityFragment() {

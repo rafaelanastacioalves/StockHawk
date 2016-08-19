@@ -159,6 +159,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                         Toast.makeText(getApplicationContext(), R.string.invalid_stock, Toast.LENGTH_SHORT).show();
                     }
                   }
+                  c.close();
                 }
               })
               .show();
@@ -316,6 +317,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             if (!Utils.isNetworkAvailable(this)) {
               message = R.string.empty_forecast_list_no_network;
             }
+          case StockTaskService.LOCATION_STATUS_INVALID:
+            break;
+          case StockTaskService.LOCATION_STATUS_OK:
+            break;
+          case StockTaskService.LOCATION_STATUS_UNKNOWN:
+            break;
         }
         tv.setText(message);
       }
