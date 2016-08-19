@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.ui;
 
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.db.chart.model.LineSet;
+import com.db.chart.view.ChartView;
 import com.db.chart.view.LineChartView;
 import com.db.chart.view.animation.Animation;
 import com.sam_chordas.android.stockhawk.R;
@@ -65,7 +67,7 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
         // TODO - Make a range for history...
         if (mData != null && id == CURSOR_LOADER_STOCK_HISTORY_ID){
             Log.i(LOG_TAG, "on CreateLoader with data and same ID for Stock History!");
-            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY ( " + QuoteColumns.BIDPRICE + ") ORDER BY ( " + QuoteColumns.LAST_TRADE_DATE + ") LIMIT ( 10 ";
+            String selection = QuoteColumns.BIDPRICE + " NOT NULL )" + " GROUP BY ( " + QuoteColumns.BIDPRICE + ") ORDER BY ( " + QuoteColumns._ID + ") "+ " ASC  LIMIT ( 10 ";
             return new CursorLoader(getContext(), mData,
                     new String[]{ QuoteColumns._ID, QuoteColumns.BIDPRICE, QuoteColumns.ISUP, QuoteColumns.LAST_TRADE_DATE}, selection ,null, null);
 
@@ -101,14 +103,21 @@ public class StockHistoryActivityFragment extends Fragment implements LoaderMana
 
             LineSet ls = new LineSet(labels,  values);
 
-            ls.setFill(getResources().getColor(R.color.material_blue_500));
+
             Animation animation = new Animation();
             animation.setDuration(1000);
 
-            ls.setDotsColor(getResources().getColor(R.color.material_red_700));
 
+            ls.setDotsColor(getResources().getColor(R.color.material_red_700));
             lChart.addData(ls);
+
+
             lChart.setAxisBorderValues(Utils.getMinValue(values) , Utils.getMaxValue(values));
+            Paint gridPaint = new Paint();
+            gridPaint.setColor(getResources().getColor(R.color.material_black));
+            lChart.setGrid(ChartView.GridType.FULL, gridPaint);
+
+
 
             if (lChart.isShown()){
                 Log.i(LOG_TAG,"Showing chart Data!");
