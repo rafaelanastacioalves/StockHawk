@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -63,9 +64,19 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private long lastSyncTimeStamp;
 
   @Override
+  protected void onPause() {
+    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+    sp.unregisterOnSharedPreferenceChangeListener(this);
+    super.onPause();
+  }
+
+  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
+
+    Utils.setLastUserStockValidSearchStatus(this, true);
+
     ConnectivityManager cm =
         (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -187,7 +198,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   @Override
   public void onResume() {
-    super.onResume();
+    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+    sp.registerOnSharedPreferenceChangeListener(this);
     getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
     ConnectivityManager cm =
             (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -199,6 +211,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
       networkToast();
     }
+    super.onResume();
+
   }
 
   public void networkToast(){
@@ -273,14 +287,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-      Log.i(LOG_TAG, "Getting the preference value for key: " + key);
+    Log.i(LOG_TAG, "Getting the preference value for key: " + key);
     if (key.equals(getString(R.string.pref_stock_query_status_key))) {
       setUpEmptyView();
     }
     if(key.equals(getString(R.string.pref_user_search_stock_valid_status))){
-        if(Utils.getLastUserValidStockSearch(getApplicationContext()) == true ){
+        if(Utils.getLastUserValidStockSearch(getApplicationContext()) == false ){
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_stock), Toast.LENGTH_SHORT).show();
-
+            Utils.setLastUserStockValidSearchStatus(this, true);
         }
     }
   }

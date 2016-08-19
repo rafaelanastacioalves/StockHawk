@@ -217,6 +217,17 @@ public class Utils {
 
   }
 
+  public static void setLastUserStockValidSearchStatus(Context c, boolean b) {
+      Log.i(LOG_TAG, "Telling that the Stock Search validity is " + b + " ...");
+      SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+      SharedPreferences.Editor spe = sp.edit();
+      spe.putBoolean(c.getString(R.string.pref_user_search_stock_valid_status), b);
+      spe.commit();
+      Log.i(LOG_TAG, "... Done");
+
+
+  }
+
   public static class InvalidStockException extends NullPointerException {
   }
 }

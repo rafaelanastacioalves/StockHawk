@@ -155,10 +155,11 @@ public class StockTaskService extends GcmTaskService{
             try{
                 mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                         Utils.quoteJsonToContentVals(getResponse));
-                setLastUserStockValidSearchStatus(mContext, true);
+                Utils.setLastUserStockValidSearchStatus(mContext, true);
 
             }catch (Utils.InvalidStockException e){
-                setLastUserStockValidSearchStatus(mContext, false);
+              Log.e(LOG_TAG, e.getClass().getSimpleName());
+                Utils.setLastUserStockValidSearchStatus(mContext, false);
             }
 
           setStockQueryStatus(mContext, LOCATION_STATUS_OK);
@@ -181,13 +182,7 @@ public class StockTaskService extends GcmTaskService{
     return result;
   }
 
-    private void setLastUserStockValidSearchStatus(Context c, boolean b) {
-        Log.i(LOG_TAG, "Telling that the Stock Search validity is " + b);
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-        SharedPreferences.Editor spe = sp.edit();
-        spe.putBoolean(c.getString(R.string.pref_user_search_stock_valid_status), b);
-        spe.commit();
-    }
+
 
     private void updateWidget() {
     if(mContext != null){
