@@ -23,6 +23,10 @@
     <!--Used for storing the user search for stock validity status shared preferences -->
     <string name="pref_user_search_stock_valid_status">valid-stock-search</string>
 
+    <!-- Used to warn the user that his new stock inserted is already used-->
+    <string name="already_saved">This stock is already saved!</string>
+
+
 
     <!--Used for error showing when make a query for stocks-->
     <string name="empty_forecast_list_server_down">No stock available. The server is not returning data.</string>
