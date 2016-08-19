@@ -88,18 +88,24 @@ public abstract class CursorRecyclerViewAdapter <VH extends RecyclerView.ViewHol
         mCursor.registerDataSetObserver(mDataSetObserver);
       }
 
-      //setting EmptyList 0 for VISIBLE and 8 for GONE
-      mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+
+
       Log.i(LOG_TAG,"Set emptyView visibility: " + mEmptyView.getVisibility());
 
 
       rowIdColumn = newCursor.getColumnIndexOrThrow("_id");
       dataIsValid = true;
       notifyDataSetChanged();
+
+      //setting EmptyList 0 for VISIBLE and 8 for GONE
+      mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }else{
+      
       rowIdColumn = -1;
       dataIsValid = false;
       notifyDataSetChanged();
+      //setting EmptyList 0 for VISIBLE and 8 for GONE
+      mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
     return oldCursor;
   }

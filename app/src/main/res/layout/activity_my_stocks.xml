@@ -16,7 +16,7 @@
       android:layout_height="match_parent"
       android:gravity="center"
       android:fontFamily="sans-serif-condensed"
-      android:visibility="invisible"
+      android:visibility="gone"
       android:textAppearance="?android:textAppearanceLarge"
       android:text="@string/empty_forecast_list"/>
 
