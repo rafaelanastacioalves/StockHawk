@@ -78,14 +78,10 @@ public class StockTaskService extends GcmTaskService{
       mContext = this;
     }
     StringBuilder urlStringBuilder = new StringBuilder();
-    try{
       // Base URL for the Yahoo query
-      urlStringBuilder.append("https://query.yahooapis.com/v1/public/yql?q=");
-      urlStringBuilder.append(URLEncoder.encode("select * from yahoo.finance.quotes where symbol "
-        + "in (", "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
+      urlStringBuilder.append("https://www.quandl.com/api/v3/datasets/WIKI/");
+
+
     if (params.getTag().equals("init") || params.getTag().equals("periodic")){
       isUpdate = true;
       initQueryCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
@@ -94,6 +90,10 @@ public class StockTaskService extends GcmTaskService{
       if (initQueryCursor.getCount() == 0 || initQueryCursor == null){
         // Init task. Populates DB with quotes for the symbols seen below
         try {
+          String[] defaultSymbolArray = {"YHOO","AAP","GOOG","MSFT"};
+          for (String stockSymbol : defaultSymbolArray){
+            finishJobFor(urlStringBuilder,stockSymbol);
+          }
           urlStringBuilder.append(
               URLEncoder.encode("\"YHOO\",\"AAPL\",\"GOOG\",\"MSFT\")", "UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -124,9 +124,15 @@ public class StockTaskService extends GcmTaskService{
         e.printStackTrace();
       }
     }
+
+
+    return result;
+  }
+
+  private void finishJobFor(StringBuilder urlStringBuilder, String stockSymbol) {
+    urlStringBuilder.append(stockSymbol);
     // finalize the URL for the API query.
-    urlStringBuilder.append("&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables."
-        + "org%2Falltableswithkeys&callback=");
+    urlStringBuilder.append(".json?column_index=4&start_date=2015-09-20&end_date=2017-09-20");
 
     String urlString;
     String getResponse;
@@ -134,6 +140,7 @@ public class StockTaskService extends GcmTaskService{
 
     if (urlStringBuilder != null){
       urlString = urlStringBuilder.toString();
+      Log.i(LOG_TAG,"urlString: " + urlString);
       try{
         getResponse = fetchData(urlString);
         JSONObject jsonObject = new JSONObject(getResponse);
@@ -150,17 +157,17 @@ public class StockTaskService extends GcmTaskService{
           if (isUpdate){
             contentValues.put(QuoteColumns.ISCURRENT, 0);
             mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
-                null, null);
+                    null, null);
           }
-            try{
-                mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-                        Utils.quoteJsonToContentVals(getResponse));
-                Utils.setLastUserStockValidSearchStatus(mContext, true);
+          try{
+            mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
+                    Utils.quoteJsonToContentVals(getResponse));
+            Utils.setLastUserStockValidSearchStatus(mContext, true);
 
-            }catch (Utils.InvalidStockException e){
-              Log.e(LOG_TAG, e.getClass().getSimpleName());
-                Utils.setLastUserStockValidSearchStatus(mContext, false);
-            }
+          }catch (Utils.InvalidStockException e){
+            Log.e(LOG_TAG, e.getClass().getSimpleName());
+            Utils.setLastUserStockValidSearchStatus(mContext, false);
+          }
 
           setStockQueryStatus(mContext, LOCATION_STATUS_OK);
           setSyncTimeStamp(mContext);
@@ -178,13 +185,10 @@ public class StockTaskService extends GcmTaskService{
 
       }
     }
-
-    return result;
   }
 
 
-
-    private void updateWidget() {
+  private void updateWidget() {
     if(mContext != null){
       // Setting the package ensures that only components in our app will receive the broadcast
       Intent dataUpdatedIntent = new Intent(ACTION_NEW_DATA)
