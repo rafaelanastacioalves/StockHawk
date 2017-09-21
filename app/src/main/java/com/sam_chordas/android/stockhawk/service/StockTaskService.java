@@ -46,6 +46,7 @@ public class StockTaskService extends GcmTaskService{
   private Context mContext;
   private StringBuilder mStoredSymbols = new StringBuilder();
   private boolean isUpdate;
+  private int result;
 
   @Retention(RetentionPolicy.SOURCE)
   @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
@@ -89,16 +90,15 @@ public class StockTaskService extends GcmTaskService{
           null, null);
       if (initQueryCursor.getCount() == 0 || initQueryCursor == null){
         // Init task. Populates DB with quotes for the symbols seen below
-        try {
-          String[] defaultSymbolArray = {"YHOO","AAP","GOOG","MSFT"};
-          for (String stockSymbol : defaultSymbolArray){
-            finishJobFor(urlStringBuilder,stockSymbol);
+          String[] defaultSymbolArray = {"YHOO","AAPL","GOOG","MSFT"};
+          for (String stockSymbol : defaultSymbolArray) {
+            StringBuilder urlCopy = new StringBuilder(urlStringBuilder);
+            finishJobFor(urlCopy, stockSymbol);
+
           }
-          urlStringBuilder.append(
-              URLEncoder.encode("\"YHOO\",\"AAPL\",\"GOOG\",\"MSFT\")", "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
-        }
+        result = GcmNetworkManager.RESULT_SUCCESS;
+
+
       } else if (initQueryCursor != null){
         DatabaseUtils.dumpCursor(initQueryCursor);
         initQueryCursor.moveToFirst();
@@ -118,11 +118,9 @@ public class StockTaskService extends GcmTaskService{
       isUpdate = false;
       // get symbol from params.getExtra and build query
       String stockInput = params.getExtras().getString("symbol");
-      try {
-        urlStringBuilder.append(URLEncoder.encode("\""+stockInput+"\")", "UTF-8"));
-      } catch (UnsupportedEncodingException e){
-        e.printStackTrace();
-      }
+      finishJobFor(urlStringBuilder,stockInput);
+      result = GcmNetworkManager.RESULT_SUCCESS;
+
     }
 
 
@@ -130,13 +128,18 @@ public class StockTaskService extends GcmTaskService{
   }
 
   private void finishJobFor(StringBuilder urlStringBuilder, String stockSymbol) {
-    urlStringBuilder.append(stockSymbol);
     // finalize the URL for the API query.
+    try {
+      urlStringBuilder.append(
+              URLEncoder.encode(stockSymbol, "UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
     urlStringBuilder.append(".json?column_index=4&start_date=2015-09-20&end_date=2017-09-20");
 
     String urlString;
     String getResponse;
-    int result = GcmNetworkManager.RESULT_FAILURE;
+    result = GcmNetworkManager.RESULT_FAILURE;
 
     if (urlStringBuilder != null){
       urlString = urlStringBuilder.toString();
@@ -146,9 +149,8 @@ public class StockTaskService extends GcmTaskService{
         JSONObject jsonObject = new JSONObject(getResponse);
         if (jsonObject != null && jsonObject.length() == 0) {
           setStockQueryStatus(mContext, LOCATION_STATUS_SERVER_DOWN);
-          return result;
         }else {
-          result = GcmNetworkManager.RESULT_SUCCESS;
+//          result = GcmNetworkManager.RESULT_SUCCESS;
 
         }
         try {
